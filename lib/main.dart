@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'WebRTC lets learn together'),
+      home: MyHomePage(title: 'Flutter Demo'),
     );
   }
 }
@@ -31,7 +31,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _localRenderer = new RTCVideoRenderer();
-  MediaStream _localStream; 
+  final _localRenderer2 = new RTCVideoRenderer();
+
+  MediaStream _localStream;
   @override
   dispose() {
     _localStream.dispose();
@@ -48,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   initRenderers() async {
     await _localRenderer.initialize();
+    await _localRenderer2.initialize();
   }
 
   _getUserMedia() async {
@@ -55,9 +58,10 @@ class _MyHomePageState extends State<MyHomePage> {
       'audio': false,
       'video': {
         'mandatory': {
+          // 'Width': '200',
           'minWidth':
-              '1280', // Provide your own width, height and frame rate here
-          'minHeight': '720',
+              '640', // Provide your own width, height and frame rate here
+          'minHeight': '200',
           'minFrameRate': '30',
         },
         'facingMode': 'user',
@@ -68,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _localStream = await navigator.getUserMedia(mediaConstraints);
 
     _localRenderer.srcObject = _localStream;
+    _localRenderer2.srcObject = _localStream;
   }
 
   @override
@@ -76,29 +81,30 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      // body: Container(
-      //   child: new Stack(
-      //     children: <Widget>[
-      //       new Positioned(
-      //         top: 0.0,
-      //         right: 0.0,
-      //         left: 0.0,
-      //         bottom: 0.0,
-      //         child: new Container(child: new RTCVideoView(_localRenderer)),
-      //       ),
-      //     ],
-      //   ),
-      // ),
       body: OrientationBuilder(
         builder: (context, orientation) {
-          return Center(
-            child: Container(
-              margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: RTCVideoView(_localRenderer, mirror: true),
-              decoration: BoxDecoration(color: Colors.black54),
-            ),
+          return Row(
+            children: [
+              Container(
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                  width: 640,
+                  height: 480,
+                  child: RTCVideoView(_localRenderer, mirror: true),
+                  decoration: BoxDecoration(color: Colors.black54),
+                ),
+              ),
+              Container(
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                  width: 640,
+                  height: 480,
+                  child: RTCVideoView(_localRenderer2, mirror: true),
+                  decoration: BoxDecoration(color: Colors.black54),
+                ),
+              )
+            ],
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
           );
         },
       ),
